@@ -12,6 +12,7 @@
 #include <time.h>
 #include <thread>
 #include <mutex>
+#include <vector>
 
 class Relay_tower_lamp
 {
@@ -24,8 +25,8 @@ private:
     bool serial_connect(void);
 
     void recieve_lamp_msg_callback(const std_msgs::ByteMultiArray::ConstPtr &relay_lamp_msg);
-    bool send_serial_protocol_to_relay(void);
-    
+    bool send_serial_protocol_to_relay(unsigned char to_send_protocol_data[],unsigned int send_data_size);
+
     //Subscriber
     ros::Subscriber relay_tower_lamp_sub;
     ros::Subscriber test_sub;
