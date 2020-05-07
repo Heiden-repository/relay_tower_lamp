@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 
-#include "std_msgs/Int32.h"
+#include "std_msgs/Int8.h"
 
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
@@ -36,7 +36,7 @@ private:
     void initSubscriber();
     bool serial_connect(void);
 
-    void recieve_lamp_msg_callback(const std_msgs::Int32::ConstPtr &relay_lamp_msg);
+    void recieve_lamp_msg_callback(const std_msgs::Int8::ConstPtr &relay_lamp_msg);
     bool send_serial_protocol_to_relay(int light_signal_num);
 
     //Subscriber

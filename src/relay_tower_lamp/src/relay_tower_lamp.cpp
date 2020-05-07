@@ -10,13 +10,13 @@ void Relay_tower_lamp::initSubscriber()
     relay_tower_lamp_sub = nh_.subscribe("/lamp_signal", 10, &Relay_tower_lamp::recieve_lamp_msg_callback, this);
 }
 
-void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int32::ConstPtr &relay_lamp_msg)
+void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int8::ConstPtr &relay_lamp_msg)
 {
     int light_signal_num = relay_lamp_msg->data;
     printf("light_signal_num : %d\n",light_signal_num);
-    bool send_success = send_serial_protocol_to_relay(light_signal_num);
-    if(send_success) ROS_INFO("change lights");
-    else ROS_INFO("fail to change lights");
+    //bool send_success = send_serial_protocol_to_relay(light_signal_num);
+    // if(send_success) ROS_INFO("change lights");
+    // else ROS_INFO("fail to change lights");
 }
 
 bool Relay_tower_lamp::serial_connect(void)
@@ -61,9 +61,11 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         //write_data = write(serial_port, for_writing, 1);
         if (write_data > 0)
         {
-            break;
+            return 1;
         }
     }
+
+    return 0;
 }
 
 void Relay_tower_lamp::runLoop(void)
