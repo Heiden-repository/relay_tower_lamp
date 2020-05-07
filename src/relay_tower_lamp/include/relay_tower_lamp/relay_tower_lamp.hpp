@@ -15,14 +15,17 @@
 
 #define turn_off_all 0 
 
-#define turn_on_red_light 1
-#define turn_off_red_light 2
+#define turn_off_red_light 10
+#define turn_on_red_light 11
+#define flashing_red_light 12
 
-#define turn_on_yellow_light 3
-#define turn_off_yellow_light 4
+#define turn_off_yellow_light 20
+#define turn_on_yellow_light 21
+#define flashing_yellow_light 22
 
-#define turn_on_green_light 5
-#define turn_off_green_light 6
+#define turn_off_green_light 30
+#define turn_on_green_light 31
+#define flashing_green_light 32
 
 #define turn_on_all 7
 
