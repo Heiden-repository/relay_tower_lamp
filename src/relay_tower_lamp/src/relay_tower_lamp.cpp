@@ -14,7 +14,9 @@ void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int32::ConstPtr
 {
     int light_signal_num = relay_lamp_msg->data;
     printf("light_signal_num : %d\n",light_signal_num);
-    //send_serial_protocol_to_relay(light_signal_num);
+    bool send_success = send_serial_protocol_to_relay(light_signal_num);
+    if(send_success) ROS_INFO("change lights");
+    else ROS_INFO("fail to change lights");
 }
 
 bool Relay_tower_lamp::serial_connect(void)
@@ -52,7 +54,16 @@ bool Relay_tower_lamp::serial_connect(void)
 
 bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
 {
-    
+    int write_data = -1;
+
+    while (1)
+    {
+        //write_data = write(serial_port, for_writing, 1);
+        if (write_data > 0)
+        {
+            break;
+        }
+    }
 }
 
 void Relay_tower_lamp::runLoop(void)
