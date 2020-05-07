@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 
-#include "relay_tower_lamp/relay_tower_lamp.h"
+#include "std_msgs/Bool.h"
+#include "std_msgs/ByteMultiArray.h"
 
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
@@ -18,19 +19,16 @@ private:
     ros::NodeHandle &nh_;
     int serial_port;
 
-    unsigned char red_light;
-    unsigned char yellow_light;
-    unsigned char green_light;
-
     void initValue(void);
-    void initSubscriber(void);
+    void initSubscriber();
     bool serial_connect(void);
 
-    void recieve_lamp_msg_callback(const relay_tower_lamp::relay_tower_lamp::ConstPtr &relay_lamp_msg);
+    void recieve_lamp_msg_callback(const std_msgs::ByteMultiArray::ConstPtr &relay_lamp_msg);
     bool send_serial_protocol_to_relay(void);
-
+    
     //Subscriber
     ros::Subscriber relay_tower_lamp_sub;
+    ros::Subscriber test_sub;
 
 public:
     void runLoop(void);
