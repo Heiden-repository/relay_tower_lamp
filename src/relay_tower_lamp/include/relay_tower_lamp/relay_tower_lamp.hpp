@@ -1,8 +1,7 @@
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 
-#include "std_msgs/Bool.h"
-#include "std_msgs/ByteMultiArray.h"
+#include "std_msgs/Int32.h"
 
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function
@@ -14,6 +13,19 @@
 #include <mutex>
 #include <vector>
 
+#define turn_off_all 0 
+
+#define turn_on_red_light 1
+#define turn_off_red_light 2
+
+#define turn_on_yellow_light 3
+#define turn_off_yellow_light 4
+
+#define turn_on_green_light 5
+#define turn_off_green_light 6
+
+#define turn_on_all 7
+
 class Relay_tower_lamp
 {
 private:
@@ -24,12 +36,11 @@ private:
     void initSubscriber();
     bool serial_connect(void);
 
-    void recieve_lamp_msg_callback(const std_msgs::ByteMultiArray::ConstPtr &relay_lamp_msg);
-    bool send_serial_protocol_to_relay(unsigned char to_send_protocol_data[],unsigned int send_data_size);
+    void recieve_lamp_msg_callback(const std_msgs::Int32::ConstPtr &relay_lamp_msg);
+    bool send_serial_protocol_to_relay(int light_signal_num);
 
     //Subscriber
     ros::Subscriber relay_tower_lamp_sub;
-    ros::Subscriber test_sub;
 
 public:
     void runLoop(void);

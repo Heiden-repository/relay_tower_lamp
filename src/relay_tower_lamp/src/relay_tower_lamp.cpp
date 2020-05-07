@@ -7,18 +7,14 @@ void Relay_tower_lamp::initValue(void)
 
 void Relay_tower_lamp::initSubscriber()
 {
-    relay_tower_lamp_sub = nh_.subscribe("/lamp_signal", 1, &Relay_tower_lamp::recieve_lamp_msg_callback, this);
+    relay_tower_lamp_sub = nh_.subscribe("/lamp_signal", 10, &Relay_tower_lamp::recieve_lamp_msg_callback, this);
 }
 
-void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::ByteMultiArray::ConstPtr &relay_lamp_msg)
+void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int32::ConstPtr &relay_lamp_msg)
 {
-    printf("nice \n");
-    unsigned int msg_data_size = relay_lamp_msg->layout.dim[0].size;
-    unsigned char to_send_protocol_data[msg_data_size];
-    for (int i = 0; i < msg_data_size; i++)
-        to_send_protocol_data[i] = relay_lamp_msg->data[i];
-
-    //send_serial_protocol_to_relay(to_send_protocol_data,msg_data_size);
+    int light_signal_num = relay_lamp_msg->data;
+    printf("light_signal_num : %d\n",light_signal_num);
+    //send_serial_protocol_to_relay(light_signal_num);
 }
 
 bool Relay_tower_lamp::serial_connect(void)
@@ -54,16 +50,9 @@ bool Relay_tower_lamp::serial_connect(void)
     printf("Relay connection\n");
 }
 
-bool Relay_tower_lamp::send_serial_protocol_to_relay(unsigned char to_send_protocol_data[],unsigned int send_data_size)
+bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
 {
-    int write_data = -1;
-    while(1)
-    {
-        write_data = write(serial_port,to_send_protocol_data,send_data_size);
-        if(write_data > 0)
-            return 1;
-    }
-    return 0;
+    
 }
 
 void Relay_tower_lamp::runLoop(void)
@@ -73,7 +62,7 @@ void Relay_tower_lamp::runLoop(void)
     while (ros::ok())
     {
         //printf("red_light : %u yellow_light : %u green_light : %u\n",red_light, yellow_light, green_light);
-
+        ros::spinOnce();
         r.sleep();
     }
 }
