@@ -70,7 +70,7 @@ public:
     {
         initValue();
         initSubscriber();
-        //serial_connect();
+        serial_connect();
     }
 
     ~Relay_tower_lamp()

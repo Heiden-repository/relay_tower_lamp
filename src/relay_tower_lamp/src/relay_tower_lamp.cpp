@@ -2,7 +2,7 @@
 
 void Relay_tower_lamp::initValue(void)
 {
-    serial_port = 0;
+    serial_port = -1;
     prev_light_signal = -1;
     stop_flashing = false;
 }
@@ -26,7 +26,7 @@ bool Relay_tower_lamp::serial_connect(void)
 {
     while (ros::ok())
     {
-        serial_port = open("/dev/ttyS0", O_RDWR | O_NOCTTY);
+        serial_port = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
         if (serial_port < 0)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -35,7 +35,6 @@ bool Relay_tower_lamp::serial_connect(void)
         else
             break;
     }
-
     struct termios termi;
 
     memset(&termi, 0, sizeof(termi));
@@ -91,7 +90,8 @@ bool Relay_tower_lamp::send_protocol(unsigned char send_serial_protocol[])
 
 bool Relay_tower_lamp::flashing_lamp(unsigned char send_serial_protocol[])
 {
-    std::thread([&]() {stop_flashing = true;
+    std::thread flashing_thread([&]() {
+    stop_flashing = true;
     bool switching_turn_on_off = true;
     while(stop_flashing)
     {
@@ -106,15 +106,17 @@ bool Relay_tower_lamp::flashing_lamp(unsigned char send_serial_protocol[])
             switching_turn_on_off = true;
         }
         send_protocol(send_serial_protocol);
-        std::this_thread::sleep_for(std::chrono::duration<float>(flashing_duration));
+        std::this_thread::sleep_for(std::chrono::duration<int>(1));
     }
     return 1; });
+
+    flashing_thread.detach();
 }
 
 bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
 {
     unsigned char send_serial_protocol[protocol_size];
-
+    memset(send_serial_protocol, 0, protocol_size);
     send_serial_protocol[0] = ascii_R;
     send_serial_protocol[1] = ascii_Y;
     send_serial_protocol[2] = ascii_Null;
