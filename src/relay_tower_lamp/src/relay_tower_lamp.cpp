@@ -3,6 +3,8 @@
 void Relay_tower_lamp::initValue(void)
 {
     serial_port = 0;
+    prev_light_signal = -1;
+    stop_flashing = false;
 }
 
 void Relay_tower_lamp::initSubscriber()
@@ -13,17 +15,18 @@ void Relay_tower_lamp::initSubscriber()
 void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int8::ConstPtr &relay_lamp_msg)
 {
     int light_signal_num = relay_lamp_msg->data;
-    printf("light_signal_num : %d\n",light_signal_num);
-    //bool send_success = send_serial_protocol_to_relay(light_signal_num);
-    // if(send_success) ROS_INFO("change lights");
-    // else ROS_INFO("fail to change lights");
+    //printf("light_signal_num : %d\n",light_signal_num);
+
+    if(prev_light_signal != light_signal_num)
+        send_serial_protocol_to_relay(light_signal_num);
+    else return;
 }
 
 bool Relay_tower_lamp::serial_connect(void)
 {
     while (ros::ok())
     {
-        serial_port = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
+        serial_port = open("/dev/ttyS0", O_RDWR | O_NOCTTY);
         if (serial_port < 0)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -52,13 +55,16 @@ bool Relay_tower_lamp::serial_connect(void)
     printf("Relay connection\n");
 }
 
-bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
+bool Relay_tower_lamp::turn_off_all_light(unsigned char send_serial_protocol[])
 {
     int write_data = -1;
 
+    send_serial_protocol[3] = ascii_all_light_A;
+    send_serial_protocol[5] = ascii_turn_off;
+
     while (1)
     {
-        //write_data = write(serial_port, for_writing, 1);
+        write_data = write(serial_port, send_serial_protocol, protocol_size);
         if (write_data > 0)
         {
             return 1;
@@ -66,6 +72,141 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
     }
 
     return 0;
+}
+
+bool Relay_tower_lamp::send_protocol(unsigned char send_serial_protocol[])
+{
+    int write_data = -1;
+    while (1)
+    {
+        write_data = write(serial_port, send_serial_protocol, protocol_size);
+        if (write_data > 0)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+bool Relay_tower_lamp::flashing_lamp(unsigned char send_serial_protocol[])
+{
+    std::thread([&]() {stop_flashing = true;
+    bool switching_turn_on_off = true;
+    while(stop_flashing)
+    {
+        if(switching_turn_on_off)
+        {
+             send_serial_protocol[5] = ascii_turn_on;
+             switching_turn_on_off = false;
+        }
+        else 
+        {
+            send_serial_protocol[5] = ascii_turn_off;
+            switching_turn_on_off = true;
+        }
+        send_protocol(send_serial_protocol);
+        std::this_thread::sleep_for(std::chrono::duration<float>(flashing_duration));
+    }
+    return 1; });
+}
+
+bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
+{
+    unsigned char send_serial_protocol[protocol_size];
+
+    send_serial_protocol[0] = ascii_R;
+    send_serial_protocol[1] = ascii_Y;
+    send_serial_protocol[2] = ascii_Null;
+    send_serial_protocol[3] = 0;
+    send_serial_protocol[4] = ascii_Null;
+    send_serial_protocol[5] = 0;
+    send_serial_protocol[6] = ascii_last_CR;
+
+    if (light_signal_num == 0)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 1)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_all_light_A;
+        send_serial_protocol[5] = ascii_turn_on;
+        send_protocol(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 10)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 11)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_red_light;
+        send_serial_protocol[5] = ascii_turn_on;
+        send_protocol(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 12)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_red_light;
+        flashing_lamp(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 20)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 21)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_yellow_light;
+        send_serial_protocol[5] = ascii_turn_on;
+        send_protocol(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 22)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_yellow_light;
+        flashing_lamp(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 30)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 31)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_green_light;
+        send_serial_protocol[5] = ascii_turn_on;
+        send_protocol(send_serial_protocol);
+        return 1;
+    }
+    else if (light_signal_num == 32)
+    {
+        stop_flashing = false;
+        turn_off_all_light(send_serial_protocol);
+        send_serial_protocol[3] = ascii_green_light;
+        flashing_lamp(send_serial_protocol);
+        return 1;
+    }
 }
 
 void Relay_tower_lamp::runLoop(void)
