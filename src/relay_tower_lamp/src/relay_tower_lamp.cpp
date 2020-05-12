@@ -17,9 +17,13 @@ void Relay_tower_lamp::recieve_lamp_msg_callback(const std_msgs::Int8::ConstPtr 
     int light_signal_num = relay_lamp_msg->data;
     //printf("light_signal_num : %d\n",light_signal_num);
 
-    if(prev_light_signal != light_signal_num)
+    if (prev_light_signal != light_signal_num)
+    {
+        prev_light_signal = light_signal_num;
         send_serial_protocol_to_relay(light_signal_num);
-    else return;
+    }
+    else
+        return;
 }
 
 bool Relay_tower_lamp::serial_connect(void)
