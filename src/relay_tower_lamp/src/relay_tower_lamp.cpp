@@ -125,13 +125,13 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
     send_serial_protocol[5] = 0;
     send_serial_protocol[6] = ascii_last_CR;
 
-    if (light_signal_num == 0)
+    if (light_signal_num == turn_off_all)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 1)
+    else if (light_signal_num == turn_on_all)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -140,13 +140,13 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         send_protocol(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 10)
+    else if (light_signal_num == turn_off_red_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 11)
+    else if (light_signal_num == turn_on_red_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -155,7 +155,7 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         send_protocol(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 12)
+    else if (light_signal_num == flashing_red_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -163,13 +163,13 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         flashing_lamp(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 20)
+    else if (light_signal_num == turn_off_yellow_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 21)
+    else if (light_signal_num == turn_on_yellow_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -178,7 +178,7 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         send_protocol(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 22)
+    else if (light_signal_num == flashing_yellow_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -186,13 +186,13 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         flashing_lamp(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 30)
+    else if (light_signal_num == turn_off_green_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 31)
+    else if (light_signal_num == turn_on_green_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
@@ -201,7 +201,7 @@ bool Relay_tower_lamp::send_serial_protocol_to_relay(int light_signal_num)
         send_protocol(send_serial_protocol);
         return 1;
     }
-    else if (light_signal_num == 32)
+    else if (light_signal_num == flashing_green_light)
     {
         stop_flashing = false;
         turn_off_all_light(send_serial_protocol);
