@@ -75,7 +75,7 @@ public:
 
     ~Relay_tower_lamp()
     {
-        send_serial_protocol_to_relay(0);
+        send_serial_protocol_to_relay(turn_off_all);
         close(serial_port);
     }
 };
